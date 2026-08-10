@@ -46,7 +46,7 @@
 <body>
 
 <header>
-    <h1>🚀 DevOps new batch will strat on sep 28 6:45 AM IST KKDEVOPS.COM KK🚀</h1>
+    <marquee> <h1> WELCOME TO B10 KKDEVOPS </h1>    </marquee> 
     <h3>Training | Development | Consulting</h3>
 </header>
 
