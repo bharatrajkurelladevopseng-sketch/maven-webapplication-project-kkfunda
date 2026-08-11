@@ -4,7 +4,8 @@
 node 
 {
    //     /var/lib/jenkins/tools/hudson.tasks.Maven_MavenInstallation/maven-3.9.16/bin
-
+  echo "git JOB Name: ${env.JOB_NAME}"
+  echo "build number: ${env.BUILD_NUMBER}"
   def mavenHome=tool name: "maven-3.9.16"
   
   try
