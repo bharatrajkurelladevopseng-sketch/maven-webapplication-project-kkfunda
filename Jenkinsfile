@@ -33,9 +33,9 @@ node
       
       sh """
 
-      curl -u rr:Ravi@123 \
+      curl -u kk:password \
 --upload-file /var/lib/jenkins/workspace/scripted-way-PL-1/target/maven-web-application.war \
-"http://3.108.215.15:8080/manager/text/deploy?path=/maven-web-application&update=true"
+"http://13.235.77.122:8080/manager/text/deploy?path=/maven-web-application&update=true"
           
         """
     }
