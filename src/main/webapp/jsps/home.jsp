@@ -46,7 +46,7 @@
 <body>
 
 <header>
-    <marquee> <h1> WELCOME TO B10 KKDEVOPS </h1>    </marquee> 
+     <h1> WELCOME TO B10 KKDEVOPS NEW MORNING BATCH WILL START ON SEP 28 </h1>     
     <h3>Training | Development | Consulting</h3>
 </header>
 
