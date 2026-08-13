@@ -1,45 +1,109 @@
 
-
-
-node 
+pipeline 
 {
-   //     /var/lib/jenkins/tools/hudson.tasks.Maven_MavenInstallation/maven-3.9.16/bin
-
-   def mavenHome=tool name: "maven-3.9.16"
-  stage('git checkout')
+  agent any
+  tools
   {
-      git branch: 'master', url: 'https://github.com/kkdevopsb10/maven-webapplication-project-kkfunda.git'
+    maven "maven-3.9.16"
   }
-  stage('compile')
+  stages
   {
-   sh "${mavenHome}/bin/mvn compile"
-  }
-   stage('Build')
-  {
-   sh "${mavenHome}/bin/mvn clean package"
-  }
-   stage('SQ REPORT')
-  {
-   sh "${mavenHome}/bin/mvn sonar:sonar"
-  }
-  stage('Deploy Artifact')
-  {
-   sh "${mavenHome}/bin/mvn deploy"
-  }
-
-
-    stage('Deploy to Tomcat') 
+    stage('git checkout')
     {
-      
-      sh """
+      steps
+      {
+      notifyBuild('STARTED')
+      git branch: 'master', url: 'https://github.com/kkdevopsb10/maven-webapplication-project-kkfunda.git'
+      }
+    }
+    stage('COMPILE')
+    {
+      steps
+      {
+        sh "mvn compile"
+      }
+    }
+   stage('Build')
+    {
+      steps
+      {
+        sh "mvn clean package"
+      }
+    }
+    stage('SQ Report')
+    {
+      steps
+      {
+        sh "mvn sonar:sonar"
+      }
+    }
+   stage('Articat Backup')
+    {
+      steps
+      {
+        sh "mvn deploy"
+      }
+    }
+   stage('Deploy To Tomcat')
+    {
+      steps
+      {
+        sh """
 
       curl -u kk:password \
---upload-file /var/lib/jenkins/workspace/scripted-way-PL-1/target/maven-web-application.war \
-"http://13.235.77.122:8080/manager/text/deploy?path=/maven-web-application&update=true"
+--upload-file /var/lib/jenkins/workspace/Declarative-PL-webapp/target/maven-web-application.war \
+"http://65.0.183.199:8080/manager/text/deploy?path=/maven-web-application&update=true"
           
         """
+      }
     }
 
-	
-	
-}  // node ending
+
+
+  } //stages ending
+
+post {
+  success {
+
+    script
+    {
+     notifyBuild(currentBuild.result)
+    }
+    
+  }
+  failure {
+
+  script
+  {
+    notifyBuild(currentBuild.result)
+
+  }
+   
+  }
+}
+    
+} //pipeline ending
+
+// Notification method
+def notifyBuild(String buildStatus = 'STARTED') {
+    buildStatus = buildStatus ?: 'SUCCESS'
+
+    def colorCode
+    def subject = "${buildStatus}: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]'"
+    def summary = "${subject} (${env.BUILD_URL})"
+
+    switch (buildStatus) {
+        case 'STARTED':
+            colorCode = '#FFFF00' // Yellow
+            break
+        case 'SUCCESS':
+            colorCode = '#00FF00' // Green
+            break
+        default:
+            colorCode = '#FF0000' // Red
+    }
+
+    slackSend(color: colorCode, message: summary, channel: '#airtel-project')
+}
+
+
