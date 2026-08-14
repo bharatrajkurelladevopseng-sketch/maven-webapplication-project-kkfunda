@@ -57,6 +57,13 @@ pipeline
         """
       }
     }
+    stage('airtel-dev')
+    {
+      steps
+      {
+         build job: 'airtel-dev'
+      }
+    }
 
 
 
