@@ -1,116 +1,33 @@
-
-pipeline 
+node
 {
-  agent any
-  tools
-  {
-    maven "maven-3.9.16"
-  }
-  stages
-  {
-    stage('git checkout')
+    def mavenhome = tool "maven-3.9.16"
+       stage('git checkout')
     {
-      steps
-      {
-      notifyBuild('STARTED')
-      git branch: 'master', url: 'https://github.com/kkdevopsb10/maven-webapplication-project-kkfunda.git'
-      }
-    }
-    stage('COMPILE')
-    {
-      steps
-      {
-        sh "mvn compile"
-      }
-    }
-   stage('Build')
-    {
-      steps
-      {
-        sh "mvn clean package"
-      }
-    }
-    stage('SQ Report')
-    {
-      steps
-      {
-        sh "mvn sonar:sonar"
-      }
-    }
-   stage('Articat Backup')
-    {
-      steps
-      {
-        sh "mvn deploy"
-      }
-    }
-   stage('Deploy To Tomcat')
-    {
-      steps
-      {
-        sh """
-
-      curl -u kk:password \
---upload-file /var/lib/jenkins/workspace/Declarative-PL-webapp/target/maven-web-application.war \
-"http://13.235.76.166:8080/manager/text/deploy?path=/maven-web-application&update=true"
-          
-        """
-      }
-    }
-    stage('airtel-dev')
-    {
-      steps
-      {
-         build job: 'airtel-dev'
-      }
+       git 'https://github.com/bharatrajkurelladevopseng-sketch/maven-webapplication-project-kkfunda.git'
     }
 
-
-
-  } //stages ending
-
-post {
-  success {
-
-    script
+        stage('compile')
     {
-     notifyBuild(currentBuild.result)
+        sh "${mavenhome}/bin/mvn compile"
     }
-    
-  }
-  failure {
-
-  script
-  {
-    notifyBuild(currentBuild.result)
-
-  }
-   
-  }
+        stage('build')
+    {
+        sh "${mavenhome}/bin/mvn clean package"
+    }
+        stage('SonarQube report')
+    {
+        sh "${mavenhome}/bin/mvn sonar:sonar"
+    }
+            stage('nexus')
+    {
+        sh "${mavenhome}/bin/mvn deploy"
+    }
+    stage('Deploy to Tomcat')
+    {
+    sh """
+        curl -u bharat:bharat \
+        --upload-file target/maven-web-application.war \
+        "http://44.222.203.122:8080/manager/text/deploy?path=/maven-web-application&update=true"
+    """
+     }
 }
-    
-} //pipeline ending
-
-// Notification method
-def notifyBuild(String buildStatus = 'STARTED') {
-    buildStatus = buildStatus ?: 'SUCCESS'
-
-    def colorCode
-    def subject = "${buildStatus}: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]'"
-    def summary = "${subject} (${env.BUILD_URL})"
-
-    switch (buildStatus) {
-        case 'STARTED':
-            colorCode = '#FFFF00' // Yellow
-            break
-        case 'SUCCESS':
-            colorCode = '#00FF00' // Green
-            break
-        default:
-            colorCode = '#FF0000' // Red
-    }
-
-    slackSend(color: colorCode, message: summary, channel: '#airtel-project')
-}
-
-
