@@ -27,7 +27,7 @@ node
     sh """
         curl -u bharat:bharat \
         --upload-file target/maven-web-application.war \
-        "http://54.144.90.137:8080/manager/text/deploy?path=/maven-web-application&update=true"
+        "http://18.215.156.195:8080/manager/text/deploy?path=/maven-web-application&update=true"
     """
      }
 }
